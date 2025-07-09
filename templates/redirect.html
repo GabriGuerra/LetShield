@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LetShield Redirect</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/redirect.css') }}" />
+</head>
+<body>
+  <div class="preset-box">
+    {% if preset == "404" %}
+      <h1>Erro 404</h1>
+      <p>Página não encontrada.</p>
+    {% elif preset == "unsafe" %}
+      <h1>Esta conexão não é segura</h1>
+      <p>O site que você tentou acessar pode estar comprometido.</p>
+    {% elif preset == "whatsapp" %}
+      <h1>WhatsApp Web indisponível</h1>
+      <p>Não foi possível conectar à plataforma.</p>
+    {% elif preset == "network" %}
+      <h1>Falha de rede</h1>
+      <p>O acesso foi bloqueado por configurações locais de internet.</p>
+    {% else %}
+      <h1>Carregando...</h1>
+      <p>Estamos redirecionando você.</p>
+    {% endif %}
+
+    <div class="loading">Aguarde um momento…</div>
+    <div class="spinner"></div>
+  </div>
+
+  <script>
+    setTimeout(() => {
+      window.location.href = "{{ target_url }}";
+    }, 4000);
+  </script>
+</body>
+</html>

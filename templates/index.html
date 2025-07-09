@@ -13,32 +13,51 @@
     <h1>Dashboard LetShield</h1>
 
     <form id="newTrackForm" aria-label="Formulário para criar novo rastreio">
-      <input type="text" id="nameInput" placeholder="Nome do suspeito" required autocomplete="off" />
-      <input type="text" id="slugInput" placeholder="URL personalizada" autocomplete="off" />
-      <input type="text" id="messageInput" placeholder="Máscara" autocomplete="off" />
+      <input type="text" id="messageInput" placeholder="Texto do link (opcional)" autocomplete="off" />
+
+      <label for="presetSelect" style="font-weight:600;color:#a0c8ff;">Disfarce visual:</label>
+      <select id="presetSelect"
+              style="padding:10px 14px;border-radius:8px;border:none;font-size:1rem;
+                     background:#272a3b;color:#cfd9e5;">
+        <option value="404">Erro 404 clássico</option>
+        <option value="whatsapp">WhatsApp Web indisponível</option>
+        <option value="youtube_error">Erro no YouTube</option>
+        <option value="google_expired">Sessão expirada Google</option>
+        <option value="login_failed">Falha de login Microsoft</option>
+        <option value="instagram_down">Instagram fora do ar</option>
+        <option value="twitter_offline">Twitter offline</option>
+        <option value="blank">Página neutra em branco</option>
+        <option value="layout">Layout LetShield personalizado</option>
+        <option value="custom">URL personalizada</option>
+      </select>
+
+      <input type="url" id="customUrlInput"
+             placeholder="Cole sua URL aqui"
+             autocomplete="off"
+             style="display:none;padding:10px 14px;border-radius:8px;
+                    border:none;font-size:1rem;background:#272a3b;color:#cfd9e5;
+                    margin-top:8px;"
+      />
+
       <button type="submit" id="submitBtn">Criar Link</button>
       <div id="result" role="alert" aria-live="polite"></div>
     </form>
 
-    <table id="table" aria-label="Tabela de suspeitos">
+    <table id="table" aria-label="Tabela de rastreios">
       <thead>
         <tr>
-          <th>Nome</th>
           <th>Link</th>
+          <th>Texto</th>
           <th>Data</th>
-          <th>Mapa</th>
-          <th>Detalhes</th>
-          <th>Excluir</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody id="tbody">
-        <tr class="empty"><td colspan="6">Carregando suspeitos...</td></tr>
+        <tr class="empty"><td colspan="4">Carregando...</td></tr>
       </tbody>
     </table>
 
-    <a href="/docs" class="link-adv" style="color: var(--neon); display: block; margin-top: 28px; text-align: center; font-weight: 600; text-decoration: none; text-shadow: 0 0 10px var(--neon);">
-      Opções Avançadas →
-    </a>
+    <a href="/docs" class="link-adv">Opções Avançadas →</a>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
