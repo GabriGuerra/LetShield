@@ -169,3 +169,29 @@ def api_delete_suspect(token):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
+
+
+@app.route('/preview/<token>')
+def preview_page(token):
+    suspect = SUSPECTS_DB.get(token)
+    if not suspect:
+        return redirect(url_for('index'))
+
+    # Recupera mensagem personalizada
+    message = suspect.get("message", "Clique aqui")
+
+    # Constrói a URL final para redirecionar (a mesma usada em /go/<token>)
+    preset     = request.args.get("preset", "layout")
+    custom_url = request.args.get("custom", "").strip()
+
+    # Constrói redirecionamento
+    target_url = url_for('go_redirect', token=token, preset=preset)
+    if preset == "custom" and custom_url:
+        target_url += f"&custom={custom_url}"
+
+    return render_template(
+        "preview.html",
+        message=message,
+        token=token,
+        target_url=target_url
+    )

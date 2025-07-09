@@ -1,14 +1,14 @@
-// script.js — LetShield Dashboard aprimorado
+// LetShield Dashboard — script.js final com ajustes completos
 
 function loadSuspects() {
   const tbody = document.getElementById("tbody");
-  tbody.innerHTML = '<tr class="empty"><td colspan="4">Carregando...</td></tr>';
+  tbody.innerHTML = "";
 
   fetch("/api/suspects", { credentials: "include" })
     .then((r) => r.json())
     .then((suspects) => {
       if (!suspects.length) {
-        tbody.innerHTML = '<tr class="empty"><td colspan="4">Nenhum link criado ainda.</td></tr>';
+        tbody.innerHTML = '<tr class="empty"><td colspan="3">Nenhum link criado ainda.</td></tr>';
         return;
       }
 
@@ -18,64 +18,48 @@ function loadSuspects() {
           .then((details) => {
             const date = new Date(item.created_at).toLocaleString();
             const token = item.token;
-            const preset = guessPresetFromToken(token); // Temporário
+            const preset = guessPresetFromToken(token);
             const message = escapeHtml(details.message || "Clique aqui");
-            const link = `/go/${token}?preset=${preset}`;
+            const disfarcedLink = `/go/${token}?preset=${preset}`;
+            const originalLink = `/track/${token}`;
 
             const tr = document.createElement("tr");
             tr.innerHTML = `
-              <td data-label="Disfarce">${presetLabel(preset)}</td>
-              <td data-label="Texto">
-                <a href="${link}" target="_blank" rel="noopener noreferrer"
-                   style="text-decoration:none;color:inherit;font-weight:600;">
+              <td data-label="Link">
+                <a href="#" class="copy-link" data-url="${disfarcedLink}" data-message="${message}" title="Clique para copiar">
                   ${message}
-                </a>
+                </a><br>
+                <small class="original-link">${originalLink}</small>
               </td>
-              <td data-label="Data">${date}</td>
-              <td data-label="Ações">
-                <button class="btn-analyze" data-token="${token}" title="Ver detalhes">🔎</button>
-                <button class="btn-delete" data-token="${token}" title="Excluir">❌</button>
+              <td data-label="Data" style="font-size:0.9rem;">${date}</td>
+              <td data-label="Ações" style="text-align:right;">
+                <a href="${originalLink}" class="neon btn-details">Detalhes</a>
+                <button class="btn-delete neon" data-token="${token}">X</button>
               </td>
             `;
             tbody.appendChild(tr);
           })
       );
 
-      Promise.all(rows).then(() => attachListeners());
+      Promise.all(rows).then(() => {
+        attachDeleteListeners();
+        attachCopyListeners();
+      });
     })
     .catch(() => {
-      tbody.innerHTML = '<tr class="empty"><td colspan="4">Erro ao carregar dados.</td></tr>';
+      tbody.innerHTML = '<tr class="empty"><td colspan="3">Erro ao carregar dados.</td></tr>';
     });
 }
 
-function attachListeners() {
-  document.querySelectorAll(".btn-analyze").forEach((btn) => {
-    btn.onclick = async () => {
-      const token = btn.dataset.token;
-      try {
-        const res = await fetch(`/api/suspect/${token}`, { credentials: "include" });
-        if (!res.ok) throw new Error();
-        const d = await res.json();
-        alert(`📌 Rastreamento:
-• Texto: ${d.message}
-• IP: ${d.ip}
-• Navegador: ${d.browser}
-• Sistema: ${d.platform}
-• Cidade: ${d.city}
-• País: ${d.country}`);
-      } catch {
-        alert("Erro ao abrir os detalhes.");
-      }
-    };
-  });
-
+function attachDeleteListeners() {
   document.querySelectorAll(".btn-delete").forEach((btn) => {
     btn.onclick = async () => {
       if (!confirm("Excluir este rastreio?")) return;
       const token = btn.dataset.token;
       try {
         await fetch(`/api/suspect/${token}`, {
-          method: "DELETE", credentials: "include"
+          method: "DELETE",
+          credentials: "include",
         });
         loadSuspects();
       } catch {
@@ -85,42 +69,45 @@ function attachListeners() {
   });
 }
 
-// Auxiliares
-
-function guessPresetFromToken(token) {
-  return "layout"; // No futuro, podemos salvar isso no SUSPECTS_DB
+function attachCopyListeners() {
+  document.querySelectorAll(".copy-link").forEach((link) => {
+    link.onclick = (e) => {
+      e.preventDefault();
+      const url = link.dataset.url;
+      const message = link.dataset.message;
+      navigator.clipboard.writeText(location.origin + url);
+      link.textContent = "Copiado!";
+      setTimeout(() => (link.textContent = message), 1200);
+    };
+  });
 }
 
-function presetLabel(preset) {
-  const map = {
-    "404": "Erro 404",
-    "whatsapp": "WhatsApp",
-    "youtube_error": "YouTube",
-    "google_expired": "Google",
-    "login_failed": "Microsoft",
-    "instagram_down": "Instagram",
-    "twitter_offline": "Twitter",
-    "blank": "Página em branco",
-    "layout": "LetShield",
-    "custom": "Custom"
-  };
-  return map[preset] || "–";
+function guessPresetFromToken(token) {
+  return "layout";
 }
 
 function escapeHtml(text) {
   return text.replace(/[<>&"]/g, (c) =>
-    ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c])
+    { return { "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]; }
   );
+}
+
+function normalizeUrl(raw) {
+  const trimmed = raw.trim();
+  if (!/^https?:\/\//i.test(trimmed)) {
+    return "https://" + trimmed;
+  }
+  return trimmed;
 }
 
 loadSuspects();
 
-const form        = document.getElementById("newTrackForm");
-const msgInput    = document.getElementById("messageInput");
-const presetSel   = document.getElementById("presetSelect");
+const form = document.getElementById("newTrackForm");
+const msgInput = document.getElementById("messageInput");
+const presetSel = document.getElementById("presetSelect");
 const customInput = document.getElementById("customUrlInput");
-const resultDiv   = document.getElementById("result");
-const submitBtn   = document.getElementById("submitBtn");
+const resultDiv = document.getElementById("result");
+const submitBtn = document.getElementById("submitBtn");
 
 presetSel.onchange = () => {
   customInput.style.display = presetSel.value === "custom" ? "block" : "none";
@@ -130,8 +117,11 @@ form.onsubmit = async (e) => {
   e.preventDefault();
 
   const message = msgInput.value.trim() || "Clique aqui";
-  const preset  = presetSel.value;
-  const custom  = customInput.value.trim();
+  const preset = presetSel.value;
+  let custom = customInput.value.trim();
+  if (preset === "custom" && custom) {
+    custom = normalizeUrl(custom);
+  }
 
   submitBtn.disabled = true;
   submitBtn.textContent = "Criando…";
@@ -143,7 +133,7 @@ form.onsubmit = async (e) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message }),
-      credentials: "include"
+      credentials: "include",
     });
 
     if (!res.ok) {
@@ -151,22 +141,9 @@ form.onsubmit = async (e) => {
       throw new Error(err.detail || "Erro ao criar link");
     }
 
-    const { url } = await res.json();
-    const token = url.split("/").pop();
-    let finalLink = `/go/${token}?preset=${preset}`;
-    if (preset === "custom" && custom) {
-      finalLink += `&custom=${encodeURIComponent(custom)}`;
-    }
-
-    resultDiv.innerHTML = `
-      <p>
-        <a href="${finalLink}" target="_blank" rel="noopener noreferrer"
-           style="text-decoration:none;color:inherit;font-weight:600;">
-          ${escapeHtml(message)}
-        </a>
-      </p>`;
     msgInput.value = "";
     customInput.value = "";
+    resultDiv.innerHTML = `<p style="text-align:center;">Link criado com sucesso ✅</p>`;
     loadSuspects();
   } catch (err) {
     resultDiv.textContent = err.message;

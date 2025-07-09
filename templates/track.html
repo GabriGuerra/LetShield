@@ -5,38 +5,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rastreamento | LetShield</title>
 
-  <!-- Fonts e estilo -->
+  <!-- Fonte e estilo -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-  <script src="{{ url_for('static', filename='js/track.js') }}"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
-  <!-- Leaflet (sem integrity para evitar bloqueios) -->
+  <!-- Leaflet (sem integrity para evitar bloqueio de CORS) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 </head>
 <body>
-  <div class="container">
-    <h1>Rastreamento LetShield</h1>
-    <p id="messageText"></p>
+  <div class="track-container">
+    <h1 class="track-header">Rastreamento LetShield</h1>
+    <p class="track-message" id="messageText">Carregando mensagem...</p>
 
-    <!-- Mapa -->
-    <div id="map" style="height: 400px; width: 100%; margin-top: 1rem;"></div>
+    <div id="map"></div>
 
-    <!-- Dados -->
-    <div class="info">
-      <p><strong>IP:</strong> <span id="ip">Carregando...</span></p>
-      <p><strong>Cidade:</strong> <span id="city">Carregando...</span></p>
-      <p><strong>País:</strong> <span id="country">Carregando...</span></p>
-      <p><strong>Navegador:</strong> <span id="browser">Carregando...</span></p>
-      <p><strong>Sistema:</strong> <span id="platform">Carregando...</span></p>
-      <p><strong>Data de criação:</strong> <span id="createdAt">Carregando...</span></p>
-      <p><strong>Último acesso:</strong> <span id="lastAccess">Carregando...</span></p>
+    <div class="track-info">
+      <div>
+        <label>IP</label>
+        <span id="ip">...</span>
+      </div>
+      <div>
+        <label>Cidade</label>
+        <span id="city">...</span>
+      </div>
+      <div>
+        <label>País</label>
+        <span id="country">...</span>
+      </div>
+      <div>
+        <label>Navegador</label>
+        <span id="browser">...</span>
+      </div>
+      <div>
+        <label>Sistema</label>
+        <span id="platform">...</span>
+      </div>
+      <div>
+        <label>Criado em</label>
+        <span id="createdAt">...</span>
+      </div>
+      <div>
+        <label>Último acesso</label>
+        <span id="lastAccess">...</span>
+      </div>
     </div>
   </div>
 
-  <!-- Leaflet JS -->
+  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-
-  <!-- Script do projeto -->
   <script src="{{ url_for('static', filename='js/track.js') }}"></script>
 </body>
 </html>
