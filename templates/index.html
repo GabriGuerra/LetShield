@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Suspeitos | LetShield</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+</head>
+<body>
+  <div class="container">
+    <h1>Dashboard LetShield</h1>
+
+    <form id="newTrackForm" aria-label="Formulário para criar novo rastreio">
+      <input type="text" id="nameInput" placeholder="Nome do suspeito" required autocomplete="off" />
+      <input type="text" id="slugInput" placeholder="URL personalizada" autocomplete="off" />
+      <input type="text" id="messageInput" placeholder="Máscara" autocomplete="off" />
+      <button type="submit" id="submitBtn">Criar Link</button>
+      <div id="result" role="alert" aria-live="polite"></div>
+    </form>
+
+    <table id="table" aria-label="Tabela de suspeitos">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Link</th>
+          <th>Data</th>
+          <th>Mapa</th>
+          <th>Detalhes</th>
+          <th>Excluir</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr class="empty"><td colspan="6">Carregando suspeitos...</td></tr>
+      </tbody>
+    </table>
+
+    <a href="/docs" class="link-adv" style="color: var(--neon); display: block; margin-top: 28px; text-align: center; font-weight: 600; text-decoration: none; text-shadow: 0 0 10px var(--neon);">
+      Opções Avançadas →
+    </a>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
